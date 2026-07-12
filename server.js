@@ -19,6 +19,11 @@ db.exec(`
   )
 `);
 
+// 舊版留言板沒有 email 欄位，補上（改版後留言含聯絡方式，僅後台可讀）
+if (!db.prepare('PRAGMA table_info(messages)').all().some((c) => c.name === 'email')) {
+  db.exec('ALTER TABLE messages ADD COLUMN email TEXT');
+}
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS bookings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,10 +39,10 @@ db.exec(`
 `);
 
 const listStmt = db.prepare(
-  'SELECT id, name, message, created_at FROM messages ORDER BY id DESC LIMIT 100'
+  'SELECT id, name, email, message, created_at FROM messages ORDER BY id DESC LIMIT 100'
 );
 const insertStmt = db.prepare(
-  'INSERT INTO messages (name, message) VALUES (?, ?)'
+  'INSERT INTO messages (name, email, message) VALUES (?, ?, ?)'
 );
 
 const insertBookingStmt = db.prepare(
@@ -56,7 +61,7 @@ function isAdmin(req) {
   return ADMIN_KEY && req.headers['x-admin-key'] === ADMIN_KEY;
 }
 
-const SERVICES = ['工作坊設計與引導', '領導力教練', '一對一導師陪伴', '演講與 Podcast 合作'];
+const SERVICES = ['工作坊設計與引導', '領導力教練', '職場導師', 'Podcast & 演講邀約'];
 
 // 每個 IP 一分鐘最多 5 則，防灌水
 const postLog = new Map();
@@ -100,7 +105,12 @@ function serveFile(res, filePath) {
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  if (url.pathname === '/api/messages' && req.method === 'GET') {
+  // 留言含聯絡方式，改版後僅後台可讀
+  if (url.pathname === '/api/admin/messages' && req.method === 'GET') {
+    if (!isAdmin(req)) {
+      sendJSON(res, ADMIN_KEY ? 401 : 503, { error: ADMIN_KEY ? '金鑰錯誤' : '尚未設定 ADMIN_KEY 環境變數' });
+      return;
+    }
     sendJSON(res, 200, listStmt.all());
     return;
   }
@@ -121,16 +131,21 @@ const server = http.createServer((req, res) => {
         return;
       }
       const name = String(data.name || '').trim().slice(0, 30);
-      const message = String(data.message || '').trim().slice(0, 200);
-      if (!name || !message) {
-        sendJSON(res, 400, { error: '名字和留言都要填喔' });
+      const email = String(data.email || '').trim().slice(0, 100);
+      const message = String(data.message || '').trim().slice(0, 500);
+      if (!name || !email || !message) {
+        sendJSON(res, 400, { error: '姓名、Email 和訊息都要填喔' });
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        sendJSON(res, 400, { error: 'Email 格式看起來不太對' });
         return;
       }
       if (rateLimited(ip)) {
-        sendJSON(res, 429, { error: '留言太頻繁了，休息一下再來吧' });
+        sendJSON(res, 429, { error: '送出太頻繁了，休息一下再來吧' });
         return;
       }
-      insertStmt.run(name, message);
+      insertStmt.run(name, email, message);
       sendJSON(res, 201, { ok: true });
     });
     return;

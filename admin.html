@@ -26,6 +26,7 @@
   }
   .wrap { max-width: 960px; margin: 0 auto; }
   h1 { color: var(--deep); font-size: 1.6rem; margin-bottom: 20px; }
+  h2.section-h { color: var(--deep); font-size: 1.15rem; margin: 28px 0 12px; }
   .login {
     background: var(--card);
     border-radius: 16px;
@@ -103,7 +104,10 @@
     <button id="load">載入預約資料</button>
   </div>
   <p class="status" id="status"></p>
+  <h2 class="section-h">預約申請</h2>
   <div id="list"></div>
+  <h2 class="section-h">留言</h2>
+  <div id="msg-list"></div>
 </div>
 <script>
   const keyInput = document.getElementById('key');
@@ -197,12 +201,60 @@
     listEl.appendChild(table);
   }
 
+  const msgListEl = document.getElementById('msg-list');
+
+  function renderMessages(messages) {
+    msgListEl.textContent = '';
+    if (!messages.length) {
+      const p = document.createElement('p');
+      p.className = 'empty';
+      p.textContent = '目前還沒有留言。';
+      msgListEl.appendChild(p);
+      return;
+    }
+    const table = document.createElement('table');
+    table.innerHTML = '<thead><tr><th>#</th><th>聯絡資訊</th><th>訊息</th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    for (const m of messages) {
+      const tr = document.createElement('tr');
+
+      const tdId = document.createElement('td');
+      tdId.dataset.label = '#';
+      tdId.textContent = m.id;
+
+      const tdWho = document.createElement('td');
+      tdWho.dataset.label = '聯絡資訊';
+      const nameEl = document.createElement('strong');
+      nameEl.textContent = m.name;
+      const contactEl = document.createElement('div');
+      contactEl.className = 'meta';
+      contactEl.textContent = m.email || '（未留 Email）';
+      const whenEl = document.createElement('div');
+      whenEl.className = 'meta';
+      whenEl.textContent = '送出於 ' + new Date(m.created_at + 'Z').toLocaleString('zh-TW');
+      tdWho.append(nameEl, contactEl, whenEl);
+
+      const tdMsg = document.createElement('td');
+      tdMsg.dataset.label = '訊息';
+      tdMsg.textContent = m.message;
+
+      tr.append(tdId, tdWho, tdMsg);
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    msgListEl.appendChild(table);
+  }
+
   async function load() {
     statusEl.textContent = '';
     try {
-      const bookings = await api('/api/admin/bookings');
+      const [bookings, messages] = await Promise.all([
+        api('/api/admin/bookings'),
+        api('/api/admin/messages'),
+      ]);
       sessionStorage.setItem('adminKey', keyInput.value.trim());
       render(bookings);
+      renderMessages(messages);
     } catch (err) {
       statusEl.textContent = err.message === 'Failed to fetch' ? '連線失敗' : err.message;
     }
