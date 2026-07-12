@@ -416,26 +416,42 @@
     background: var(--moss-100);
     color: var(--moss-700);
   }
-  .slot-grid {
+  .calendar-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
   }
-  .slot-grid button {
-    padding: 10px 8px;
+  .cal-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px 10px;
     border-radius: var(--radius-s);
     border: 1px solid var(--border-subtle);
     background: var(--surface-card);
     color: var(--text-secondary);
     font-family: var(--font-body);
-    font-size: 13px;
     cursor: pointer;
     transition: background var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard), border-color var(--duration-fast) var(--ease-standard);
   }
-  .slot-grid button.active {
+  .cal-day .cal-wd {
+    font-size: 11px;
+    opacity: 0.75;
+  }
+  .cal-day .cal-date {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .cal-day.active {
     border-color: var(--accent-primary);
     background: var(--accent-primary);
     color: var(--paper-50);
+  }
+  @media (max-width: 560px) {
+    .cal-day .cal-wd { font-size: 10px; }
+    .cal-day .cal-date { font-size: 12px; }
+    .cal-day { padding: 6px 2px 8px; }
   }
   .form-block { display: flex; flex-direction: column; gap: 24px; }
   .form-block[hidden] { display: none; }
@@ -674,14 +690,15 @@
             </div>
           </div>
           <div>
-            <div class="field-label">選擇時段（同步 Google Calendar 可預約時間）</div>
-            <div class="slot-grid" id="slot-grid">
-              <button type="button">週二 10:00</button>
-              <button type="button">週三 14:00</button>
-              <button type="button">週四 16:00</button>
-              <button type="button">週五 11:00</button>
-              <button type="button">週五 15:00</button>
-              <button type="button">週六 10:00</button>
+            <div class="field-label">選擇日期（未來兩週）</div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+          </div>
+          <div>
+            <div class="field-label">方便聯繫的時間</div>
+            <div class="pill-group" id="period-pills">
+              <button type="button" data-value="上午（10:00-12:00）">上午（10:00-12:00）</button>
+              <button type="button" data-value="下午（12:00-18:00）">下午（12:00-18:00）</button>
+              <button type="button" data-value="晚上（18:00-22:00）">晚上（18:00-22:00）</button>
             </div>
           </div>
           <div class="field-row">
@@ -779,19 +796,47 @@
         btn.addEventListener('click', () => {
           el.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
           btn.classList.add('active');
-          onChange(btn.textContent.trim());
+          onChange(btn.textContent.trim(), btn);
         });
       });
     }
 
     let selectedService = '工作坊設計與引導';
-    let selectedSlot = null;
+    let selectedDate = null;
+    let selectedPeriod = null;
     const bkSubmit = document.getElementById('bk-submit');
 
     pillGroup(document.getElementById('service-pills'), (v) => { selectedService = v; });
-    pillGroup(document.getElementById('slot-grid'), (v) => {
-      selectedSlot = v;
-      bkSubmit.disabled = false;
+
+    function updateBookingSubmitState() {
+      bkSubmit.disabled = !(selectedDate && selectedPeriod);
+    }
+
+    // 日曆：只顯示未來兩週（含今天）
+    const calendarGrid = document.getElementById('calendar-grid');
+    const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() + i);
+      const label = `${d.getMonth() + 1}/${d.getDate()}（週${WEEKDAYS[d.getDay()]}）`;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cal-day';
+      btn.innerHTML = `<span class="cal-wd">週${WEEKDAYS[d.getDay()]}</span><span class="cal-date">${d.getMonth() + 1}/${d.getDate()}</span>`;
+      btn.addEventListener('click', () => {
+        calendarGrid.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedDate = label;
+        updateBookingSubmitState();
+      });
+      calendarGrid.appendChild(btn);
+    }
+
+    pillGroup(document.getElementById('period-pills'), (v, btn) => {
+      selectedPeriod = btn.dataset.value || v;
+      updateBookingSubmitState();
     });
 
     function showSuccess(title, text) {
@@ -820,13 +865,14 @@
       status.textContent = '';
       bkSubmit.disabled = true;
       try {
+        const preferredTime = `${selectedDate} ${selectedPeriod}`;
         await postJSON('/api/bookings', {
           name: document.getElementById('bk-name').value,
           email: document.getElementById('bk-email').value,
           service: selectedService,
-          preferred_time: selectedSlot,
+          preferred_time: preferredTime,
         });
-        showSuccess('預約申請已送出', `Sara 將盡快與您確認 ${selectedSlot} 的預約，並寄送 Email 通知。`);
+        showSuccess('預約申請已送出', `Sara 將盡快與您確認 ${preferredTime} 的預約，並寄送 Email 通知。`);
       } catch (err) {
         status.textContent = err.message === 'Failed to fetch' ? '連線失敗，請稍後再試' : err.message;
         bkSubmit.disabled = false;
