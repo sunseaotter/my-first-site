@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sara｜引導師</title>
+<style>
+  :root {
+    --cream: #f6efe2;
+    --peach: #e3cda3;
+    --coral: #b98a52;
+    --sunset: #8b5a2b;
+    --amber: #c9a06a;
+    --deep: #5a3620;
+    --text: #4a3423;
+    --text-soft: #8a7358;
+    --card: #fdf8ee;
+    --leaf: #7c9473;
+    --leaf-soft: #a9bf9a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(160deg, var(--cream) 0%, #efe0c4 50%, #e6d2a8 100%);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Decorative background blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+    z-index: -1;
+  }
+  .blob-1 {
+    width: 400px; height: 400px;
+    background: var(--amber);
+    top: -100px; right: -100px;
+  }
+  .blob-2 {
+    width: 350px; height: 350px;
+    background: var(--sunset);
+    bottom: 10%; left: -120px;
+  }
+  .blob-3 {
+    width: 250px; height: 250px;
+    background: var(--leaf);
+    opacity: 0.22;
+    bottom: -80px; right: 10%;
+  }
+
+  /* Botanical background art */
+  .leaf-decor {
+    position: fixed;
+    z-index: -1;
+    color: var(--leaf);
+    opacity: 0.16;
+    pointer-events: none;
+  }
+  .leaf-decor svg { width: 100%; height: 100%; display: block; }
+
+  .leaf-tl {
+    top: -40px; left: -50px;
+    width: 260px; height: 460px;
+    transform: rotate(-18deg);
+  }
+  .leaf-br {
+    bottom: -60px; right: -40px;
+    width: 280px; height: 500px;
+    transform: rotate(200deg);
+  }
+  .leaf-mid {
+    top: 38%; right: -90px;
+    width: 190px; height: 340px;
+    opacity: 0.1;
+    transform: rotate(165deg);
+  }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Hero */
+  header.hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+  }
+
+  .avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--amber), var(--sunset));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 20px 45px rgba(139, 90, 43, 0.35), 0 0 0 8px rgba(227, 205, 163, 0.5);
+    margin-bottom: 32px;
+    animation: floaty 5s ease-in-out infinite;
+    user-select: none;
+  }
+
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+
+  .eyebrow {
+    display: inline-block;
+    padding: 6px 18px;
+    background: rgba(139, 90, 43, 0.13);
+    color: var(--sunset);
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+  }
+
+  h1.name {
+    font-size: clamp(2.8rem, 8vw, 5rem);
+    font-weight: 800;
+    background: linear-gradient(120deg, var(--sunset), var(--amber));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 0.02em;
+    margin-bottom: 12px;
+  }
+
+  .role-zh {
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .role-en {
+    font-size: clamp(0.8rem, 2vw, 0.95rem);
+    color: var(--text-soft);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+  }
+
+  .tagline {
+    max-width: 520px;
+    font-size: 1.05rem;
+    color: var(--text-soft);
+    margin-bottom: 40px;
+  }
+
+  .cta-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    padding: 14px 32px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: linear-gradient(120deg, var(--sunset), var(--amber));
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(139, 90, 43, 0.35);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--sunset);
+    border: 2px solid rgba(139, 90, 43, 0.3);
+  }
+
+  .btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 34px rgba(139, 90, 43, 0.4);
+  }
+
+  .scroll-hint {
+    margin-top: 70px;
+    color: var(--text-soft);
+    font-size: 0.85rem;
+    opacity: 0.7;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+
+  /* Sections */
+  section {
+    padding: 90px 0;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 800;
+    color: var(--deep);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    text-align: center;
+    color: var(--text-soft);
+    max-width: 560px;
+    margin: 0 auto 56px;
+    font-size: 1.02rem;
+  }
+
+  /* About */
+  .about-card {
+    background: var(--card);
+    border-radius: 28px;
+    padding: 44px;
+    box-shadow: 0 20px 50px rgba(90, 54, 32, 0.1);
+    border: 1px solid rgba(124, 148, 115, 0.25);
+    font-size: 1.08rem;
+    color: var(--text);
+  }
+
+  .about-card strong {
+    color: var(--sunset);
+  }
+
+  /* Values grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 24px;
+  }
+
+  .value-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 34px 28px;
+    text-align: center;
+    box-shadow: 0 14px 34px rgba(90, 54, 32, 0.08);
+    border: 1px solid rgba(124, 148, 115, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .value-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(139, 90, 43, 0.18);
+  }
+
+  .value-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--peach), var(--amber));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .value-card:nth-child(3) .value-icon {
+    background: linear-gradient(135deg, var(--leaf-soft), var(--leaf));
+  }
+
+  .value-card h3 {
+    font-size: 1.15rem;
+    color: var(--deep);
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .value-card p {
+    color: var(--text-soft);
+    font-size: 0.95rem;
+  }
+
+  /* Timeline / focus areas */
+  .focus-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .focus-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 26px 30px;
+    box-shadow: 0 12px 30px rgba(90, 54, 32, 0.06);
+    border: 1px solid rgba(124, 148, 115, 0.2);
+  }
+
+  .focus-num {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sunset), var(--amber));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  .focus-item h3 {
+    color: var(--deep);
+    margin-bottom: 6px;
+    font-size: 1.1rem;
+  }
+
+  .focus-item p {
+    color: var(--text-soft);
+    font-size: 0.95rem;
+  }
+
+  /* Quote */
+  .quote-section {
+    text-align: center;
+  }
+
+  blockquote {
+    font-size: clamp(1.4rem, 3.5vw, 2rem);
+    font-weight: 700;
+    color: var(--deep);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  blockquote span {
+    background: linear-gradient(120deg, var(--sunset), var(--amber));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Contact / footer */
+  .contact-card {
+    background: linear-gradient(135deg, var(--sunset), var(--amber));
+    border-radius: 30px;
+    padding: 60px 40px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 30px 60px rgba(139, 90, 43, 0.28);
+  }
+
+  .contact-card h2 {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    margin-bottom: 14px;
+    font-weight: 800;
+  }
+
+  .contact-card p {
+    opacity: 0.95;
+    max-width: 480px;
+    margin: 0 auto 30px;
+  }
+
+  .contact-btn {
+    display: inline-block;
+    background: #fff;
+    color: var(--sunset);
+    padding: 14px 36px;
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.25s ease;
+  }
+
+  .contact-btn:hover {
+    transform: translateY(-4px) scale(1.03);
+  }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px 50px;
+    color: var(--text-soft);
+    font-size: 0.85rem;
+  }
+
+  footer .heart {
+    color: var(--sunset);
+  }
+
+  @media (max-width: 600px) {
+    .about-card, .contact-card { padding: 30px 24px; }
+    section { padding: 60px 0; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="leaf-decor leaf-tl">
+    <svg viewBox="0 0 220 420" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M110 415 C 108 320 112 220 110 20" />
+      </g>
+      <g fill="currentColor" stroke="none">
+        <g transform="translate(110,380) rotate(-35)"><path d="M0 0 Q 9 -22 0 -46 Q -9 -22 0 0 Z"/></g>
+        <g transform="translate(110,380) rotate(35) scale(-1,1)"><path d="M0 0 Q 9 -22 0 -46 Q -9 -22 0 0 Z"/></g>
+        <g transform="translate(109,330) rotate(-38)"><path d="M0 0 Q 9 -24 0 -50 Q -9 -24 0 0 Z"/></g>
+        <g transform="translate(109,330) rotate(38) scale(-1,1)"><path d="M0 0 Q 9 -24 0 -50 Q -9 -24 0 0 Z"/></g>
+        <g transform="translate(109,280) rotate(-40)"><path d="M0 0 Q 8 -22 0 -46 Q -8 -22 0 0 Z"/></g>
+        <g transform="translate(109,280) rotate(40) scale(-1,1)"><path d="M0 0 Q 8 -22 0 -46 Q -8 -22 0 0 Z"/></g>
+        <g transform="translate(110,230) rotate(-38)"><path d="M0 0 Q 7 -20 0 -42 Q -7 -20 0 0 Z"/></g>
+        <g transform="translate(110,230) rotate(38) scale(-1,1)"><path d="M0 0 Q 7 -20 0 -42 Q -7 -20 0 0 Z"/></g>
+        <g transform="translate(110,180) rotate(-35)"><path d="M0 0 Q 6 -18 0 -38 Q -6 -18 0 0 Z"/></g>
+        <g transform="translate(110,180) rotate(35) scale(-1,1)"><path d="M0 0 Q 6 -18 0 -38 Q -6 -18 0 0 Z"/></g>
+        <g transform="translate(110,135) rotate(-32)"><path d="M0 0 Q 5 -16 0 -34 Q -5 -16 0 0 Z"/></g>
+        <g transform="translate(110,135) rotate(32) scale(-1,1)"><path d="M0 0 Q 5 -16 0 -34 Q -5 -16 0 0 Z"/></g>
+        <g transform="translate(110,95) rotate(-28)"><path d="M0 0 Q 4 -14 0 -28 Q -4 -14 0 0 Z"/></g>
+        <g transform="translate(110,95) rotate(28) scale(-1,1)"><path d="M0 0 Q 4 -14 0 -28 Q -4 -14 0 0 Z"/></g>
+        <g transform="translate(110,20) rotate(0)"><path d="M0 0 Q 6 -16 0 -34 Q -6 -16 0 0 Z"/></g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="leaf-decor leaf-br">
+    <svg viewBox="0 0 220 420" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M110 415 C 108 320 112 220 110 20" />
+      </g>
+      <g fill="currentColor" stroke="none">
+        <g transform="translate(110,380) rotate(-35)"><path d="M0 0 Q 9 -22 0 -46 Q -9 -22 0 0 Z"/></g>
+        <g transform="translate(110,380) rotate(35) scale(-1,1)"><path d="M0 0 Q 9 -22 0 -46 Q -9 -22 0 0 Z"/></g>
+        <g transform="translate(109,330) rotate(-38)"><path d="M0 0 Q 9 -24 0 -50 Q -9 -24 0 0 Z"/></g>
+        <g transform="translate(109,330) rotate(38) scale(-1,1)"><path d="M0 0 Q 9 -24 0 -50 Q -9 -24 0 0 Z"/></g>
+        <g transform="translate(109,280) rotate(-40)"><path d="M0 0 Q 8 -22 0 -46 Q -8 -22 0 0 Z"/></g>
+        <g transform="translate(109,280) rotate(40) scale(-1,1)"><path d="M0 0 Q 8 -22 0 -46 Q -8 -22 0 0 Z"/></g>
+        <g transform="translate(110,230) rotate(-38)"><path d="M0 0 Q 7 -20 0 -42 Q -7 -20 0 0 Z"/></g>
+        <g transform="translate(110,230) rotate(38) scale(-1,1)"><path d="M0 0 Q 7 -20 0 -42 Q -7 -20 0 0 Z"/></g>
+        <g transform="translate(110,180) rotate(-35)"><path d="M0 0 Q 6 -18 0 -38 Q -6 -18 0 0 Z"/></g>
+        <g transform="translate(110,180) rotate(35) scale(-1,1)"><path d="M0 0 Q 6 -18 0 -38 Q -6 -18 0 0 Z"/></g>
+        <g transform="translate(110,135) rotate(-32)"><path d="M0 0 Q 5 -16 0 -34 Q -5 -16 0 0 Z"/></g>
+        <g transform="translate(110,135) rotate(32) scale(-1,1)"><path d="M0 0 Q 5 -16 0 -34 Q -5 -16 0 0 Z"/></g>
+        <g transform="translate(110,95) rotate(-28)"><path d="M0 0 Q 4 -14 0 -28 Q -4 -14 0 0 Z"/></g>
+        <g transform="translate(110,95) rotate(28) scale(-1,1)"><path d="M0 0 Q 4 -14 0 -28 Q -4 -14 0 0 Z"/></g>
+        <g transform="translate(110,20) rotate(0)"><path d="M0 0 Q 6 -16 0 -34 Q -6 -16 0 0 Z"/></g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="leaf-decor leaf-mid">
+    <svg viewBox="0 0 220 420" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M110 415 C 108 320 112 220 110 20" />
+      </g>
+      <g fill="currentColor" stroke="none">
+        <g transform="translate(110,330) rotate(-38)"><path d="M0 0 Q 9 -24 0 -50 Q -9 -24 0 0 Z"/></g>
+        <g transform="translate(110,330) rotate(38) scale(-1,1)"><path d="M0 0 Q 9 -24 0 -50 Q -9 -24 0 0 Z"/></g>
+        <g transform="translate(110,230) rotate(-38)"><path d="M0 0 Q 7 -20 0 -42 Q -7 -20 0 0 Z"/></g>
+        <g transform="translate(110,230) rotate(38) scale(-1,1)"><path d="M0 0 Q 7 -20 0 -42 Q -7 -20 0 0 Z"/></g>
+        <g transform="translate(110,135) rotate(-32)"><path d="M0 0 Q 5 -16 0 -34 Q -5 -16 0 0 Z"/></g>
+        <g transform="translate(110,135) rotate(32) scale(-1,1)"><path d="M0 0 Q 5 -16 0 -34 Q -5 -16 0 0 Z"/></g>
+        <g transform="translate(110,20) rotate(0)"><path d="M0 0 Q 6 -16 0 -34 Q -6 -16 0 0 Z"/></g>
+      </g>
+    </svg>
+  </div>
+
+  <header class="hero">
+    <div class="avatar">S</div>
+    <span class="eyebrow">HELLO, I'M</span>
+    <h1 class="name">Sara</h1>
+    <p class="role role-zh">工作坊引導師｜領導力教練｜導師｜Podcaster</p>
+    <p class="role role-en">Workshop Facilitator | Leadership Coach | Mentor | Podcaster</p>
+    <p class="tagline">
+      我相信每一場對話、每一堂課，都能成為一顆種子——
+      為這個世界種下多一點溫暖與光亮。
+    </p>
+    <div class="cta-group">
+      <a href="#about" class="btn btn-primary">認識我</a>
+      <a href="#contact" class="btn btn-secondary">與我聯繫</a>
+    </div>
+    <div class="scroll-hint">↓ 往下滑動，看看更多</div>
+  </header>
+
+  <div class="container">
+
+    <section id="about">
+      <h2 class="section-title">關於我</h2>
+      <p class="section-sub">一位相信正能量能改變世界的引導者</p>
+      <div class="about-card">
+        <p>
+          嗨，我是 <strong>Sara</strong>，一名引導師。我的工作是設計並帶領各種形式的工作坊，
+          陪伴人們在互動與體驗中發現自己、connect 彼此。
+        </p>
+        <br>
+        <p>
+          我喜歡任何<strong>能夠為這個世界帶來正能量</strong>的人事物——
+          一句鼓勵的話、一個溫暖的擁抱、一場啟發人心的分享，都讓我相信，
+          小小的善意可以匯聚成很大的改變。這也是我持續站在講台上、
+          設計每一場工作坊內容的初衷。
+        </p>
+      </div>
+    </section>
+
+    <section id="values">
+      <h2 class="section-title">我所相信的事</h2>
+      <p class="section-sub">支撐著我每一場工作坊的核心價值</p>
+      <div class="grid">
+        <div class="value-card">
+          <div class="value-icon">🌞</div>
+          <h3>正向能量</h3>
+          <p>相信正能量具有感染力，能一點一滴改變周遭的氛圍與人心。</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🤝</div>
+          <h3>真誠連結</h3>
+          <p>在每一次的互動中，創造安全、真實且有溫度的交流空間。</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🌱</div>
+          <h3>共同成長</h3>
+          <p>陪伴每位參與者看見自己的可能性，一起學習、一起前進。</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">✨</div>
+          <h3>啟發行動</h3>
+          <p>不只是分享知識，更希望激發大家把善意化為實際行動。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="focus">
+      <h2 class="section-title">我的工作坊聚焦於</h2>
+      <p class="section-sub">從自我覺察出發，延伸到與他人、與世界的連結</p>
+      <div class="focus-list">
+        <div class="focus-item">
+          <div class="focus-num">01</div>
+          <div>
+            <h3>自我探索與覺察</h3>
+            <p>透過引導練習，幫助參與者更了解自己的情緒、價值觀與潛能。</p>
+          </div>
+        </div>
+        <div class="focus-item">
+          <div class="focus-num">02</div>
+          <div>
+            <h3>正向溝通與連結</h3>
+            <p>建立有效且溫暖的溝通方式，讓每一段關係更真誠、更有力量。</p>
+          </div>
+        </div>
+        <div class="focus-item">
+          <div class="focus-num">03</div>
+          <div>
+            <h3>善意的實踐</h3>
+            <p>將工作坊中獲得的能量與洞察，轉化為生活中具體的善意行動。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-section">
+      <blockquote>
+        “ 世界不缺乏美好，缺乏的是<span>願意傳遞美好的人</span>。
+        我想成為那個人，也想陪你一起成為那個人。”
+      </blockquote>
+    </section>
+
+    <section id="contact">
+      <div class="contact-card">
+        <h2>一起讓世界更溫暖一點</h2>
+        <p>如果你也對正能量、成長與連結感興趣，歡迎與我聊聊，一起設計下一場有意義的工作坊。</p>
+        <a href="mailto:hello@sara-workshop.com" class="contact-btn">與 Sara 聯繫</a>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    Made with <span class="heart">♥</span> by Sara — 願正能量與你我同行
+  </footer>
+
+</body>
+</html>
