@@ -694,7 +694,7 @@
             <div class="calendar-grid" id="calendar-grid"></div>
           </div>
           <div>
-            <div class="field-label">方便聯繫的時間</div>
+            <div class="field-label">方便聯繫的時間（可複選）</div>
             <div class="pill-group" id="period-pills">
               <button type="button" data-value="上午（10:00-12:00）">上午（10:00-12:00）</button>
               <button type="button" data-value="下午（12:00-18:00）">下午（12:00-18:00）</button>
@@ -803,13 +803,13 @@
 
     let selectedService = '工作坊設計與引導';
     let selectedDate = null;
-    let selectedPeriod = null;
+    const selectedPeriods = new Set();
     const bkSubmit = document.getElementById('bk-submit');
 
     pillGroup(document.getElementById('service-pills'), (v) => { selectedService = v; });
 
     function updateBookingSubmitState() {
-      bkSubmit.disabled = !(selectedDate && selectedPeriod);
+      bkSubmit.disabled = !(selectedDate && selectedPeriods.size > 0);
     }
 
     // 日曆：只顯示未來兩週（含今天）
@@ -834,9 +834,19 @@
       calendarGrid.appendChild(btn);
     }
 
-    pillGroup(document.getElementById('period-pills'), (v, btn) => {
-      selectedPeriod = btn.dataset.value || v;
-      updateBookingSubmitState();
+    // 複選 pill 群組：方便聯繫的時間可以勾多個
+    document.querySelectorAll('#period-pills button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const value = btn.dataset.value;
+        if (selectedPeriods.has(value)) {
+          selectedPeriods.delete(value);
+          btn.classList.remove('active');
+        } else {
+          selectedPeriods.add(value);
+          btn.classList.add('active');
+        }
+        updateBookingSubmitState();
+      });
     });
 
     function showSuccess(title, text) {
@@ -865,7 +875,7 @@
       status.textContent = '';
       bkSubmit.disabled = true;
       try {
-        const preferredTime = `${selectedDate} ${selectedPeriod}`;
+        const preferredTime = `${selectedDate} ${[...selectedPeriods].join('、')}`;
         await postJSON('/api/bookings', {
           name: document.getElementById('bk-name').value,
           email: document.getElementById('bk-email').value,

@@ -170,7 +170,7 @@ const server = http.createServer((req, res) => {
       const email = String(data.email || '').trim().slice(0, 100);
       const phone = String(data.phone || '').trim().slice(0, 30);
       const service = String(data.service || '').trim();
-      const preferredTime = String(data.preferred_time || '').trim().slice(0, 50);
+      const preferredTime = String(data.preferred_time || '').trim().slice(0, 100);
       const note = String(data.note || '').trim().slice(0, 500);
       if (!name || !email) {
         sendJSON(res, 400, { error: '名字和 Email 都要填喔' });
