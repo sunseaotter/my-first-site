@@ -270,15 +270,15 @@
     border-color: transparent;
   }
 
-  /* Hero */
+  /* Hero：純圖片主視覺 */
   header.hero {
-    min-height: 92vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 60px 24px;
+    padding-top: 54px;
+  }
+
+  .hero-img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
   .avatar {
@@ -293,7 +293,7 @@
     color: #fff;
     font-weight: 700;
     box-shadow: 0 20px 45px rgba(139, 90, 43, 0.35), 0 0 0 8px rgba(227, 205, 163, 0.5);
-    margin-bottom: 32px;
+    margin: 0 auto 32px;
     animation: floaty 5s ease-in-out infinite;
     user-select: none;
     overflow: hidden;
@@ -311,99 +311,6 @@
   @keyframes floaty {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-14px); }
-  }
-
-  .eyebrow {
-    display: inline-block;
-    padding: 6px 18px;
-    background: rgba(139, 90, 43, 0.13);
-    color: var(--sunset);
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    margin-bottom: 20px;
-  }
-
-  h1.name {
-    font-size: clamp(2.8rem, 8vw, 5rem);
-    font-weight: 800;
-    background: linear-gradient(120deg, var(--sunset), var(--amber));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    letter-spacing: 0.02em;
-    margin-bottom: 12px;
-  }
-
-  .role-zh {
-    font-size: clamp(1.1rem, 3vw, 1.4rem);
-    color: var(--text);
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-
-  .role-en {
-    font-size: clamp(0.8rem, 2vw, 0.95rem);
-    color: var(--text-soft);
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 30px;
-  }
-
-  .tagline {
-    max-width: 520px;
-    font-size: 1.05rem;
-    color: var(--text-soft);
-    margin-bottom: 40px;
-  }
-
-  .cta-group {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .btn {
-    padding: 14px 32px;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 1rem;
-    text-decoration: none;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    display: inline-block;
-  }
-
-  .btn-primary {
-    background: linear-gradient(120deg, var(--sunset), var(--amber));
-    color: #fff;
-    box-shadow: 0 12px 30px rgba(139, 90, 43, 0.35);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--sunset);
-    border: 2px solid rgba(139, 90, 43, 0.3);
-  }
-
-  .btn:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 34px rgba(139, 90, 43, 0.4);
-  }
-
-  .scroll-hint {
-    margin-top: 70px;
-    color: var(--text-soft);
-    font-size: 0.85rem;
-    opacity: 0.7;
-    animation: bounce 2s infinite;
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(8px); }
   }
 
   /* Sections */
@@ -809,20 +716,7 @@
   </div>
 
   <header class="hero">
-    <div class="avatar">S<img src="sara-photo.jpg?v=4" alt="Sara 的照片" onerror="this.remove()"></div>
-    <span class="eyebrow">HELLO, I'M</span>
-    <h1 class="name">Sara</h1>
-    <p class="role role-zh">工作坊引導師｜領導力教練｜導師｜Podcaster</p>
-    <p class="role role-en">Workshop Facilitator | Leadership Coach | Mentor | Podcaster</p>
-    <p class="tagline">
-      我相信每一場對話、每一堂課，都能成為一顆種子——
-      為這個世界種下多一點溫暖與光亮。
-    </p>
-    <div class="cta-group">
-      <a href="#services" class="btn btn-primary">看看我的服務</a>
-      <a href="#booking" class="btn btn-secondary">直接預約</a>
-    </div>
-    <div class="scroll-hint">↓ 往下滑動，看看更多</div>
+    <img class="hero-img" src="hero.jpg" alt="Sara 的故事拾光——灑落陽光的木質桌上，攤開的筆記本與綠意">
   </header>
 
   <div class="container">
@@ -830,6 +724,7 @@
     <section id="about">
       <h2 class="section-title">關於我</h2>
       <p class="section-sub">一位相信正能量能改變世界的引導者</p>
+      <div class="avatar">S<img src="sara-photo.jpg?v=4" alt="Sara 的照片" onerror="this.remove()"></div>
       <div class="about-card">
         <p>
           嗨，我是 <strong>Sara</strong>，一名引導師。我的工作是設計並帶領各種形式的工作坊，
