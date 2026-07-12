@@ -115,6 +115,16 @@
     margin-bottom: 32px;
     animation: floaty 5s ease-in-out infinite;
     user-select: none;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .avatar img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   @keyframes floaty {
@@ -364,6 +374,118 @@
     color: transparent;
   }
 
+  /* Guestbook */
+  .guestbook-form {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 30px;
+    box-shadow: 0 14px 34px rgba(90, 54, 32, 0.08);
+    border: 1px solid rgba(124, 148, 115, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .guestbook-form input,
+  .guestbook-form textarea {
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text);
+    background: #fff;
+    border: 1.5px solid rgba(139, 90, 43, 0.25);
+    border-radius: 14px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    resize: none;
+  }
+
+  .guestbook-form input:focus,
+  .guestbook-form textarea:focus {
+    border-color: var(--coral);
+  }
+
+  .guestbook-form button {
+    align-self: flex-end;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(120deg, var(--sunset), var(--amber));
+    border: none;
+    border-radius: 999px;
+    padding: 12px 34px;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .guestbook-form button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(139, 90, 43, 0.35);
+  }
+
+  .guestbook-form button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+    transform: none;
+  }
+
+  .guestbook-status {
+    font-size: 0.9rem;
+    color: var(--leaf);
+    min-height: 1.4em;
+    margin: 0;
+  }
+
+  .guestbook-status.error {
+    color: #b05545;
+  }
+
+  .guestbook-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    list-style: none;
+  }
+
+  .guestbook-item {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 18px 24px;
+    box-shadow: 0 10px 24px rgba(90, 54, 32, 0.06);
+    border: 1px solid rgba(124, 148, 115, 0.18);
+  }
+
+  .guestbook-item .who {
+    font-weight: 700;
+    color: var(--deep);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .guestbook-item .when {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+
+  .guestbook-item .what {
+    color: var(--text);
+    font-size: 0.98rem;
+    overflow-wrap: anywhere;
+  }
+
+  .guestbook-empty {
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+  }
+
   /* Contact / footer */
   .contact-card {
     background: linear-gradient(135deg, var(--sunset), var(--amber));
@@ -492,7 +614,7 @@
   </div>
 
   <header class="hero">
-    <div class="avatar">S</div>
+    <div class="avatar">S<img src="sara-photo.jpg" alt="Sara 的照片" onerror="this.remove()"></div>
     <span class="eyebrow">HELLO, I'M</span>
     <h1 class="name">Sara</h1>
     <p class="role role-zh">工作坊引導師｜領導力教練｜導師｜Podcaster</p>
@@ -590,6 +712,20 @@
       </blockquote>
     </section>
 
+    <section id="guestbook">
+      <h2 class="section-title">訪客留言板</h2>
+      <p class="section-sub">留下你的名字和一句話，讓這裡多一點溫暖的痕跡</p>
+      <form class="guestbook-form" id="gb-form">
+        <input type="text" id="gb-name" placeholder="你的名字" maxlength="30" required>
+        <textarea id="gb-message" rows="3" placeholder="想說的一句話…" maxlength="200" required></textarea>
+        <p class="guestbook-status" id="gb-status"></p>
+        <button type="submit" id="gb-submit">送出留言</button>
+      </form>
+      <ul class="guestbook-list" id="gb-list">
+        <li class="guestbook-empty">留言載入中…</li>
+      </ul>
+    </section>
+
     <section id="contact">
       <div class="contact-card">
         <h2>一起讓世界更溫暖一點</h2>
@@ -604,5 +740,86 @@
     Made with <span class="heart">♥</span> by Sara — 願正能量與你我同行
   </footer>
 
+  <script>
+    const gbForm = document.getElementById('gb-form');
+    const gbName = document.getElementById('gb-name');
+    const gbMessage = document.getElementById('gb-message');
+    const gbStatus = document.getElementById('gb-status');
+    const gbSubmit = document.getElementById('gb-submit');
+    const gbList = document.getElementById('gb-list');
+
+    function renderMessages(messages) {
+      gbList.textContent = '';
+      if (!messages.length) {
+        const li = document.createElement('li');
+        li.className = 'guestbook-empty';
+        li.textContent = '還沒有留言，成為第一個留言的人吧！';
+        gbList.appendChild(li);
+        return;
+      }
+      for (const m of messages) {
+        const li = document.createElement('li');
+        li.className = 'guestbook-item';
+
+        const who = document.createElement('div');
+        who.className = 'who';
+        const name = document.createElement('span');
+        name.textContent = m.name;
+        const when = document.createElement('span');
+        when.className = 'when';
+        when.textContent = new Date(m.created_at + 'Z').toLocaleString('zh-TW', {
+          year: 'numeric', month: 'numeric', day: 'numeric',
+          hour: '2-digit', minute: '2-digit',
+        });
+        who.append(name, when);
+
+        const what = document.createElement('p');
+        what.className = 'what';
+        what.textContent = m.message;
+
+        li.append(who, what);
+        gbList.appendChild(li);
+      }
+    }
+
+    async function loadMessages() {
+      try {
+        const res = await fetch('/api/messages');
+        renderMessages(await res.json());
+      } catch {
+        gbList.textContent = '';
+        const li = document.createElement('li');
+        li.className = 'guestbook-empty';
+        li.textContent = '留言載入失敗，請稍後再試。';
+        gbList.appendChild(li);
+      }
+    }
+
+    gbForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      gbSubmit.disabled = true;
+      gbStatus.classList.remove('error');
+      gbStatus.textContent = '';
+      try {
+        const res = await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: gbName.value, message: gbMessage.value }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '送出失敗');
+        gbMessage.value = '';
+        gbStatus.textContent = '留言成功，謝謝你！';
+        await loadMessages();
+      } catch (err) {
+        gbStatus.classList.add('error');
+        gbStatus.textContent = err.message === 'Failed to fetch' ? '連線失敗，請稍後再試' : err.message;
+      } finally {
+        gbSubmit.disabled = false;
+      }
+    });
+
+    loadMessages();
+  </script>
 </body>
 </html>
