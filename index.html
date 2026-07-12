@@ -89,6 +89,187 @@
     padding: 0 24px;
   }
 
+  /* Nav bar */
+  nav.topnav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    background: rgba(246, 239, 226, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(139, 90, 43, 0.12);
+  }
+  .topnav-inner {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .topnav .brand {
+    font-weight: 800;
+    font-size: 1.15rem;
+    text-decoration: none;
+    background: linear-gradient(120deg, var(--sunset), var(--amber));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    white-space: nowrap;
+  }
+  .topnav ul {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .topnav a.navlink {
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 7px 13px;
+    border-radius: 999px;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+  }
+  .topnav a.navlink:hover { background: rgba(139, 90, 43, 0.1); }
+  .topnav a.nav-cta {
+    background: linear-gradient(120deg, var(--sunset), var(--amber));
+    color: #fff;
+  }
+  .topnav a.nav-cta:hover { background: linear-gradient(120deg, var(--sunset), var(--amber)); opacity: 0.9; }
+  @media (max-width: 600px) {
+    .topnav a.navlink { font-size: 0.8rem; padding: 6px 9px; }
+  }
+
+  /* Services */
+  .service-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 34px 28px;
+    box-shadow: 0 14px 34px rgba(90, 54, 32, 0.08);
+    border: 1px solid rgba(124, 148, 115, 0.2);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(139, 90, 43, 0.18);
+  }
+  .service-card .value-icon { margin: 0 0 18px; }
+  .service-card h3 {
+    font-size: 1.15rem;
+    color: var(--deep);
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+  .service-card p {
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    flex: 1;
+    margin-bottom: 20px;
+  }
+  .service-card .service-book {
+    align-self: flex-start;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--sunset);
+    border: 2px solid rgba(139, 90, 43, 0.3);
+    border-radius: 999px;
+    padding: 8px 22px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .service-card .service-book:hover {
+    background: linear-gradient(120deg, var(--sunset), var(--amber));
+    color: #fff;
+    border-color: transparent;
+  }
+
+  /* Testimonials */
+  .testimonial-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 30px 28px;
+    box-shadow: 0 14px 34px rgba(90, 54, 32, 0.08);
+    border: 1px solid rgba(124, 148, 115, 0.2);
+    display: flex;
+    flex-direction: column;
+  }
+  .testimonial-card .stars { color: var(--amber); letter-spacing: 3px; margin-bottom: 12px; }
+  .testimonial-card p.quote-text {
+    color: var(--text);
+    font-size: 0.98rem;
+    flex: 1;
+    margin-bottom: 18px;
+  }
+  .testimonial-card .client {
+    font-weight: 700;
+    color: var(--deep);
+    font-size: 0.9rem;
+  }
+  .testimonial-card .client span {
+    display: block;
+    font-weight: 500;
+    color: var(--text-soft);
+    font-size: 0.8rem;
+  }
+
+  /* Booking form */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+  .guestbook-form select {
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text);
+    background: #fff;
+    border: 1.5px solid rgba(139, 90, 43, 0.25);
+    border-radius: 14px;
+    padding: 12px 16px;
+    outline: none;
+  }
+  .guestbook-form select:focus { border-color: var(--coral); }
+  .guestbook-form label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-bottom: -8px;
+  }
+
+  /* Friend links */
+  .friend-links {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 18px 0 8px;
+  }
+  .friend-links a {
+    text-decoration: none;
+    color: var(--sunset);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 6px 16px;
+    border: 1.5px solid rgba(139, 90, 43, 0.25);
+    border-radius: 999px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .friend-links a:hover {
+    background: linear-gradient(120deg, var(--sunset), var(--amber));
+    color: #fff;
+    border-color: transparent;
+  }
+
   /* Hero */
   header.hero {
     min-height: 92vh;
@@ -228,6 +409,7 @@
   /* Sections */
   section {
     padding: 90px 0;
+    scroll-margin-top: 56px;
   }
 
   .section-title {
@@ -542,6 +724,19 @@
 </head>
 <body>
 
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a href="#" class="brand">Sara</a>
+      <ul>
+        <li><a class="navlink" href="#about">關於我</a></li>
+        <li><a class="navlink" href="#services">服務項目</a></li>
+        <li><a class="navlink" href="#testimonials">客戶回饋</a></li>
+        <li><a class="navlink" href="#contact">聯絡方式</a></li>
+        <li><a class="navlink nav-cta" href="#booking">預約服務</a></li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
@@ -624,8 +819,8 @@
       為這個世界種下多一點溫暖與光亮。
     </p>
     <div class="cta-group">
-      <a href="#about" class="btn btn-primary">認識我</a>
-      <a href="#contact" class="btn btn-secondary">與我聯繫</a>
+      <a href="#services" class="btn btn-primary">看看我的服務</a>
+      <a href="#booking" class="btn btn-secondary">直接預約</a>
     </div>
     <div class="scroll-hint">↓ 往下滑動，看看更多</div>
   </header>
@@ -647,6 +842,37 @@
           小小的善意可以匯聚成很大的改變。這也是我持續站在講台上、
           設計每一場工作坊內容的初衷。
         </p>
+      </div>
+    </section>
+
+    <section id="services">
+      <h2 class="section-title">服務項目</h2>
+      <p class="section-sub">從團隊到個人，陪你走一段成長的路</p>
+      <div class="grid">
+        <div class="service-card">
+          <div class="value-icon">🌿</div>
+          <h3>工作坊設計與引導</h3>
+          <p>為企業與團隊量身設計互動式工作坊——從團隊共創、願景對焦到跨部門溝通，讓每個人的聲音都被聽見。</p>
+          <a class="service-book" href="#booking" data-service="工作坊設計與引導">預約這項服務</a>
+        </div>
+        <div class="service-card">
+          <div class="value-icon">🌞</div>
+          <h3>領導力教練</h3>
+          <p>一對一教練對話，陪伴主管與新手領導者釐清挑戰、發展自己的領導風格，帶著溫度領導團隊。</p>
+          <a class="service-book" href="#booking" data-service="領導力教練">預約這項服務</a>
+        </div>
+        <div class="service-card">
+          <div class="value-icon">🌱</div>
+          <h3>一對一導師陪伴</h3>
+          <p>職涯轉換、自我探索的長期陪伴。定期對話，幫助你看見自己的價值與下一步的方向。</p>
+          <a class="service-book" href="#booking" data-service="一對一導師陪伴">預約這項服務</a>
+        </div>
+        <div class="service-card">
+          <div class="value-icon">🎙️</div>
+          <h3>演講與 Podcast 合作</h3>
+          <p>正向心理、團隊文化與領導力主題的演講邀約，或 Podcast 節目合作與跨界對談。</p>
+          <a class="service-book" href="#booking" data-service="演講與 Podcast 合作">預約這項服務</a>
+        </div>
       </div>
     </section>
 
@@ -712,6 +938,54 @@
       </blockquote>
     </section>
 
+    <section id="testimonials">
+      <h2 class="section-title">客戶回饋</h2>
+      <p class="section-sub">那些一起走過的人，想對你說的話</p>
+      <div class="grid">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="quote-text">「Sara 帶的工作坊完全不冷場，原本互不熟悉的跨部門同事，最後竟然能敞開心聊真心話。結束後團隊的氣氛真的不一樣了。」</p>
+          <div class="client">王小姐<span>科技業人資主管</span></div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="quote-text">「第一次當主管的那半年很挫折，是 Sara 的教練對話陪我釐清了自己的領導風格。現在我帶團隊更有底氣，也更像自己。」</p>
+          <div class="client">陳先生<span>新創團隊主管</span></div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="quote-text">「每次和 Sara 的導師對話都像充電。她不給標準答案，而是陪我看見自己早就擁有的答案。職涯轉換期有她陪伴，安心很多。」</p>
+          <div class="client">林小姐<span>職涯轉換中的設計師</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="booking">
+      <h2 class="section-title">預約服務</h2>
+      <p class="section-sub">留下你的聯絡方式和希望的時間，Sara 會親自與你聯繫確認</p>
+      <form class="guestbook-form" id="bk-form">
+        <label for="bk-service">想預約的服務</label>
+        <select id="bk-service" required>
+          <option value="" disabled selected>請選擇服務項目</option>
+          <option>工作坊設計與引導</option>
+          <option>領導力教練</option>
+          <option>一對一導師陪伴</option>
+          <option>演講與 Podcast 合作</option>
+        </select>
+        <div class="form-row">
+          <input type="text" id="bk-name" placeholder="你的名字" maxlength="30" required>
+          <input type="email" id="bk-email" placeholder="Email" maxlength="100" required>
+        </div>
+        <div class="form-row">
+          <input type="tel" id="bk-phone" placeholder="電話（選填）" maxlength="30">
+          <input type="text" id="bk-time" placeholder="希望的時間，例如：平日晚上、7/20 下午" maxlength="50">
+        </div>
+        <textarea id="bk-note" rows="3" placeholder="想先讓 Sara 知道的事（選填）" maxlength="500"></textarea>
+        <p class="guestbook-status" id="bk-status"></p>
+        <button type="submit" id="bk-submit">送出預約申請</button>
+      </form>
+    </section>
+
     <section id="guestbook">
       <h2 class="section-title">訪客留言板</h2>
       <p class="section-sub">留下你的名字和一句話，讓這裡多一點溫暖的痕跡</p>
@@ -730,13 +1004,20 @@
       <div class="contact-card">
         <h2>一起讓世界更溫暖一點</h2>
         <p>如果你也對正能量、成長與連結感興趣，歡迎與我聊聊，一起設計下一場有意義的工作坊。</p>
-        <a href="mailto:hello@sara-workshop.com" class="contact-btn">與 Sara 聯繫</a>
+        <a href="mailto:hello@sara-workshop.com" class="contact-btn">寫信給 Sara</a>
+        &nbsp;
+        <a href="#booking" class="contact-btn">預約服務</a>
       </div>
     </section>
 
   </div>
 
   <footer>
+    <div class="friend-links">
+      <a href="https://open.spotify.com" target="_blank" rel="noopener">🎙️ Sara 的 Podcast</a>
+      <a href="https://www.instagram.com" target="_blank" rel="noopener">📷 Instagram</a>
+      <a href="https://medium.com" target="_blank" rel="noopener">✍️ 部落格</a>
+    </div>
     Made with <span class="heart">♥</span> by Sara — 願正能量與你我同行
   </footer>
 
@@ -820,6 +1101,49 @@
     });
 
     loadMessages();
+
+    // 預約表單
+    const bkForm = document.getElementById('bk-form');
+    const bkService = document.getElementById('bk-service');
+    const bkStatus = document.getElementById('bk-status');
+    const bkSubmit = document.getElementById('bk-submit');
+
+    // 服務卡片的「預約這項服務」自動帶入選單
+    document.querySelectorAll('.service-book').forEach((a) => {
+      a.addEventListener('click', () => {
+        bkService.value = a.dataset.service;
+      });
+    });
+
+    bkForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      bkSubmit.disabled = true;
+      bkStatus.classList.remove('error');
+      bkStatus.textContent = '';
+      try {
+        const res = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('bk-name').value,
+            email: document.getElementById('bk-email').value,
+            phone: document.getElementById('bk-phone').value,
+            service: bkService.value,
+            preferred_time: document.getElementById('bk-time').value,
+            note: document.getElementById('bk-note').value,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '送出失敗');
+        bkForm.reset();
+        bkStatus.textContent = '已收到你的預約申請！Sara 會盡快與你聯繫確認時間 🌿';
+      } catch (err) {
+        bkStatus.classList.add('error');
+        bkStatus.textContent = err.message === 'Failed to fetch' ? '連線失敗，請稍後再試' : err.message;
+      } finally {
+        bkSubmit.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>

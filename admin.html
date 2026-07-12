@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Sara｜預約管理後台</title>
+<style>
+  :root {
+    --cream: #f6efe2;
+    --sunset: #8b5a2b;
+    --amber: #c9a06a;
+    --deep: #5a3620;
+    --text: #4a3423;
+    --text-soft: #8a7358;
+    --card: #fdf8ee;
+    --leaf: #7c9473;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  h1 { color: var(--deep); font-size: 1.6rem; margin-bottom: 20px; }
+  .login {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 24px;
+    border: 1px solid rgba(124, 148, 115, 0.25);
+  }
+  .login input {
+    flex: 1;
+    min-width: 200px;
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 10px 14px;
+    border: 1.5px solid rgba(139, 90, 43, 0.25);
+    border-radius: 10px;
+    outline: none;
+  }
+  button {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(120deg, var(--sunset), var(--amber));
+    border: none;
+    border-radius: 999px;
+    padding: 10px 24px;
+    cursor: pointer;
+  }
+  .status { color: #b05545; min-height: 1.4em; margin-bottom: 16px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(90, 54, 32, 0.08);
+  }
+  th, td { padding: 12px 14px; text-align: left; font-size: 0.9rem; vertical-align: top; }
+  th { background: rgba(139, 90, 43, 0.12); color: var(--deep); white-space: nowrap; }
+  tr + tr td { border-top: 1px solid rgba(139, 90, 43, 0.12); }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge.pending { background: rgba(201, 160, 106, 0.25); color: var(--sunset); }
+  .badge.confirmed { background: rgba(124, 148, 115, 0.25); color: var(--leaf); }
+  .badge.declined { background: rgba(176, 85, 69, 0.18); color: #b05545; }
+  td .actions { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  td .actions button { padding: 4px 12px; font-size: 0.78rem; }
+  td .actions button.decline { background: #b05545; }
+  .empty { text-align: center; color: var(--text-soft); padding: 30px; }
+  .meta { color: var(--text-soft); font-size: 0.8rem; }
+  @media (max-width: 700px) {
+    table, thead, tbody, tr, th, td { display: block; }
+    thead { display: none; }
+    tr { border-bottom: 2px solid rgba(139, 90, 43, 0.15); padding: 10px 0; }
+    td { padding: 6px 14px; }
+    td::before { content: attr(data-label); font-weight: 700; color: var(--deep); display: block; font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>預約管理後台</h1>
+  <div class="login">
+    <input type="password" id="key" placeholder="管理金鑰（ADMIN_KEY）">
+    <button id="load">載入預約資料</button>
+  </div>
+  <p class="status" id="status"></p>
+  <div id="list"></div>
+</div>
+<script>
+  const keyInput = document.getElementById('key');
+  const statusEl = document.getElementById('status');
+  const listEl = document.getElementById('list');
+  const STATUS_LABEL = { pending: '待確認', confirmed: '已確認', declined: '已婉拒' };
+
+  keyInput.value = sessionStorage.getItem('adminKey') || '';
+
+  async function api(path, options = {}) {
+    const res = await fetch(path, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-key': keyInput.value.trim(),
+        ...(options.headers || {}),
+      },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '發生錯誤');
+    return data;
+  }
+
+  function render(bookings) {
+    listEl.textContent = '';
+    if (!bookings.length) {
+      const p = document.createElement('p');
+      p.className = 'empty';
+      p.textContent = '目前還沒有預約。';
+      listEl.appendChild(p);
+      return;
+    }
+    const table = document.createElement('table');
+    table.innerHTML = '<thead><tr><th>#</th><th>聯絡資訊</th><th>服務項目</th><th>希望時間</th><th>備註</th><th>狀態</th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    for (const b of bookings) {
+      const tr = document.createElement('tr');
+
+      const tdId = document.createElement('td');
+      tdId.dataset.label = '#';
+      tdId.textContent = b.id;
+
+      const tdWho = document.createElement('td');
+      tdWho.dataset.label = '聯絡資訊';
+      const nameEl = document.createElement('strong');
+      nameEl.textContent = b.name;
+      const contactEl = document.createElement('div');
+      contactEl.className = 'meta';
+      contactEl.textContent = b.email + (b.phone ? '｜' + b.phone : '');
+      const whenEl = document.createElement('div');
+      whenEl.className = 'meta';
+      whenEl.textContent = '送出於 ' + new Date(b.created_at + 'Z').toLocaleString('zh-TW');
+      tdWho.append(nameEl, contactEl, whenEl);
+
+      const tdService = document.createElement('td');
+      tdService.dataset.label = '服務項目';
+      tdService.textContent = b.service;
+
+      const tdTime = document.createElement('td');
+      tdTime.dataset.label = '希望時間';
+      tdTime.textContent = b.preferred_time || '—';
+
+      const tdNote = document.createElement('td');
+      tdNote.dataset.label = '備註';
+      tdNote.textContent = b.note || '—';
+
+      const tdStatus = document.createElement('td');
+      tdStatus.dataset.label = '狀態';
+      const badge = document.createElement('span');
+      badge.className = 'badge ' + b.status;
+      badge.textContent = STATUS_LABEL[b.status] || b.status;
+      tdStatus.appendChild(badge);
+      if (b.status === 'pending') {
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        const confirmBtn = document.createElement('button');
+        confirmBtn.textContent = '確認';
+        confirmBtn.onclick = () => setStatus(b.id, 'confirmed');
+        const declineBtn = document.createElement('button');
+        declineBtn.textContent = '婉拒';
+        declineBtn.className = 'decline';
+        declineBtn.onclick = () => setStatus(b.id, 'declined');
+        actions.append(confirmBtn, declineBtn);
+        tdStatus.appendChild(actions);
+      }
+
+      tr.append(tdId, tdWho, tdService, tdTime, tdNote, tdStatus);
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    listEl.appendChild(table);
+  }
+
+  async function load() {
+    statusEl.textContent = '';
+    try {
+      const bookings = await api('/api/admin/bookings');
+      sessionStorage.setItem('adminKey', keyInput.value.trim());
+      render(bookings);
+    } catch (err) {
+      statusEl.textContent = err.message === 'Failed to fetch' ? '連線失敗' : err.message;
+    }
+  }
+
+  async function setStatus(id, status) {
+    statusEl.textContent = '';
+    try {
+      await api('/api/admin/bookings/' + id, { method: 'PATCH', body: JSON.stringify({ status }) });
+      await load();
+    } catch (err) {
+      statusEl.textContent = err.message;
+    }
+  }
+
+  document.getElementById('load').onclick = load;
+  keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') load(); });
+  if (keyInput.value) load();
+</script>
+</body>
+</html>

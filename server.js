@@ -19,12 +19,44 @@ db.exec(`
   )
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS bookings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    service TEXT NOT NULL,
+    preferred_time TEXT,
+    note TEXT,
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`);
+
 const listStmt = db.prepare(
   'SELECT id, name, message, created_at FROM messages ORDER BY id DESC LIMIT 100'
 );
 const insertStmt = db.prepare(
   'INSERT INTO messages (name, message) VALUES (?, ?)'
 );
+
+const insertBookingStmt = db.prepare(
+  'INSERT INTO bookings (name, email, phone, service, preferred_time, note) VALUES (?, ?, ?, ?, ?, ?)'
+);
+const listBookingsStmt = db.prepare(
+  'SELECT id, name, email, phone, service, preferred_time, note, status, created_at FROM bookings ORDER BY id DESC LIMIT 200'
+);
+const updateBookingStmt = db.prepare(
+  "UPDATE bookings SET status = ? WHERE id = ?"
+);
+
+// 後台管理金鑰：正式環境務必設定 ADMIN_KEY 環境變數
+const ADMIN_KEY = process.env.ADMIN_KEY;
+function isAdmin(req) {
+  return ADMIN_KEY && req.headers['x-admin-key'] === ADMIN_KEY;
+}
+
+const SERVICES = ['工作坊設計與引導', '領導力教練', '一對一導師陪伴', '演講與 Podcast 合作'];
 
 // 每個 IP 一分鐘最多 5 則，防灌水
 const postLog = new Map();
@@ -101,6 +133,93 @@ const server = http.createServer((req, res) => {
       insertStmt.run(name, message);
       sendJSON(res, 201, { ok: true });
     });
+    return;
+  }
+
+  if (url.pathname === '/api/bookings' && req.method === 'POST') {
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress;
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 10_000) req.destroy();
+    });
+    req.on('end', () => {
+      let data;
+      try {
+        data = JSON.parse(body);
+      } catch {
+        sendJSON(res, 400, { error: '格式錯誤' });
+        return;
+      }
+      const name = String(data.name || '').trim().slice(0, 30);
+      const email = String(data.email || '').trim().slice(0, 100);
+      const phone = String(data.phone || '').trim().slice(0, 30);
+      const service = String(data.service || '').trim();
+      const preferredTime = String(data.preferred_time || '').trim().slice(0, 50);
+      const note = String(data.note || '').trim().slice(0, 500);
+      if (!name || !email) {
+        sendJSON(res, 400, { error: '名字和 Email 都要填喔' });
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        sendJSON(res, 400, { error: 'Email 格式看起來不太對' });
+        return;
+      }
+      if (!SERVICES.includes(service)) {
+        sendJSON(res, 400, { error: '請選擇服務項目' });
+        return;
+      }
+      if (rateLimited(ip)) {
+        sendJSON(res, 429, { error: '送出太頻繁了，休息一下再來吧' });
+        return;
+      }
+      insertBookingStmt.run(name, email, phone || null, service, preferredTime || null, note || null);
+      sendJSON(res, 201, { ok: true });
+    });
+    return;
+  }
+
+  if (url.pathname === '/api/admin/bookings' && req.method === 'GET') {
+    if (!isAdmin(req)) {
+      sendJSON(res, ADMIN_KEY ? 401 : 503, { error: ADMIN_KEY ? '金鑰錯誤' : '尚未設定 ADMIN_KEY 環境變數' });
+      return;
+    }
+    sendJSON(res, 200, listBookingsStmt.all());
+    return;
+  }
+
+  const bookingStatusMatch = url.pathname.match(/^\/api\/admin\/bookings\/(\d+)$/);
+  if (bookingStatusMatch && req.method === 'PATCH') {
+    if (!isAdmin(req)) {
+      sendJSON(res, ADMIN_KEY ? 401 : 503, { error: ADMIN_KEY ? '金鑰錯誤' : '尚未設定 ADMIN_KEY 環境變數' });
+      return;
+    }
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 1_000) req.destroy();
+    });
+    req.on('end', () => {
+      let data;
+      try {
+        data = JSON.parse(body);
+      } catch {
+        sendJSON(res, 400, { error: '格式錯誤' });
+        return;
+      }
+      const status = String(data.status || '');
+      if (!['pending', 'confirmed', 'declined'].includes(status)) {
+        sendJSON(res, 400, { error: '狀態不正確' });
+        return;
+      }
+      updateBookingStmt.run(status, Number(bookingStatusMatch[1]));
+      sendJSON(res, 200, { ok: true });
+    });
+    return;
+  }
+
+  if (url.pathname === '/admin' && req.method === 'GET') {
+    serveFile(res, path.join(__dirname, 'admin.html'));
     return;
   }
 
